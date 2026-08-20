@@ -17,7 +17,7 @@ import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { type AnchorRef, MemoFS, memoryLexicalDocId } from "../../src/index";
+import { type AnchorRef, MemoFS } from "../../src/index";
 import {
 	extractSymbolPath,
 	isSafeAnchorPath,
@@ -559,9 +559,7 @@ describe("writeMemory @anchor marker integration", () => {
 
 		// Recall the memory and verify the anchor was persisted.
 		const recall = await memo.recall("Auth Supabase", { limit: 5 });
-		const hit = recall.items.find(
-			(i) => i.id === memoryLexicalDocId(result.id),
-		);
+		const hit = recall.items.find((i) => i.id === result.id);
 		expect(hit).toBeDefined();
 		expect(hit?.anchor).toBeDefined();
 		expect(hit?.anchor?.file).toBe("auth.ts");
@@ -581,9 +579,7 @@ describe("writeMemory @anchor marker integration", () => {
 		});
 
 		const recall = await memo.recall("Auth Supabase", { limit: 5 });
-		const hit = recall.items.find(
-			(i) => i.id === memoryLexicalDocId(result.id),
-		);
+		const hit = recall.items.find((i) => i.id === result.id);
 		expect(hit).toBeDefined();
 		expect(hit?.anchor).toBeDefined();
 		expect(hit?.anchor?.file).toBe("auth.py");
@@ -599,9 +595,7 @@ describe("writeMemory @anchor marker integration", () => {
 		});
 
 		const recall = await memo.recall("Normal", { limit: 5 });
-		const hit = recall.items.find(
-			(i) => i.id === memoryLexicalDocId(result.id),
-		);
+		const hit = recall.items.find((i) => i.id === result.id);
 		expect(hit).toBeDefined();
 		expect(hit?.anchor).toBeUndefined();
 		expect(hit?.stale).toBeUndefined();
@@ -620,9 +614,7 @@ describe("writeMemory @anchor marker integration", () => {
 
 		// Clean recall — no drift yet.
 		const clean = await memo.recall("Auth Supabase", { limit: 5 });
-		const cleanHit = clean.items.find(
-			(i) => i.id === memoryLexicalDocId(result.id),
-		);
+		const cleanHit = clean.items.find((i) => i.id === result.id);
 		expect(cleanHit?.stale).toBeUndefined();
 
 		// Mutate the file — drift.
@@ -633,9 +625,7 @@ describe("writeMemory @anchor marker integration", () => {
 		);
 
 		const drifted = await memo.recall("Auth Supabase", { limit: 5 });
-		const driftedHit = drifted.items.find(
-			(i) => i.id === memoryLexicalDocId(result.id),
-		);
+		const driftedHit = drifted.items.find((i) => i.id === result.id);
 		expect(driftedHit?.stale).toBe(true);
 		expect(driftedHit?.anchor?.file).toBe("auth.ts");
 	});
@@ -651,9 +641,7 @@ describe("writeMemory @anchor marker integration", () => {
 		const result = await memo.writeMemory({ content, kind: "reference" });
 
 		const recall = await memo.recall("App config", { limit: 5 });
-		const hit = recall.items.find(
-			(i) => i.id === memoryLexicalDocId(result.id),
-		);
+		const hit = recall.items.find((i) => i.id === result.id);
 		expect(hit).toBeDefined();
 		expect(hit?.anchor).toBeDefined();
 		expect(hit?.anchor?.file).toBe("config.json");

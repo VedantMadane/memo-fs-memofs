@@ -1,7 +1,6 @@
 export * from "./errors/errors";
 export * from "./filters/filter-match";
 export * from "./hybrid";
-export * from "./identity";
 export * from "./lexical";
 export * from "./scoring/cosine";
 export * from "./stores/fs-recall-store";

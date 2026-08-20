@@ -40,7 +40,6 @@
 
 import type { Logger } from "../../core/types/logger";
 import type { GraphNode } from "../../graph/types";
-import { resolveMemoryId } from "../../recall/identity";
 import type { GraphNodeInput, MemoryKind, RecallItem } from "../types";
 import type { LocalGraphStore } from "./types";
 
@@ -158,12 +157,7 @@ export async function applyDecay(args: {
 	const nodeIdsToUpsert: string[] = [];
 
 	for (const item of args.items) {
-		// Items carry canonical `{memoryId}#{ordinal}` doc ids while the
-		// meta map is keyed by raw memory id — resolve before lookup.
-		const memoryId = resolveMemoryId(item.id, (candidate) =>
-			args.memoryMetaByMemoryId.has(candidate),
-		);
-		const meta = args.memoryMetaByMemoryId.get(memoryId);
+		const meta = args.memoryMetaByMemoryId.get(item.id);
 		if (meta === undefined) continue;
 		if (!isMemoryDecayed(meta, args.now)) continue;
 
@@ -175,7 +169,7 @@ export async function applyDecay(args: {
 		};
 		item.score = (item.score ?? 1) * UNVERIFIED_DEMOTION_FACTOR;
 
-		const nodeIds = args.graphNodesByMemoryId.get(memoryId) ?? [];
+		const nodeIds = args.graphNodesByMemoryId.get(item.id) ?? [];
 		for (const nodeId of nodeIds) {
 			const node = args.graphNodes.get(nodeId);
 			if (node === undefined) continue;

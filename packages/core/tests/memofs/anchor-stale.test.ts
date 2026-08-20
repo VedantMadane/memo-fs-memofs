@@ -15,7 +15,6 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
 	type AnchorRef,
 	MemoFS,
-	memoryLexicalDocId,
 	NOTES_MEMORY_PATH,
 	readMemoryEvents,
 	sha256Hex,
@@ -68,9 +67,7 @@ describe("code-anchor + drift-detect end-to-end", () => {
 
 		// Sanity: a clean recall right after write surfaces the memory; no drift yet.
 		const cleanRecall = await memo.recall("Auth Supabase", { limit: 5 });
-		const cleanHit = cleanRecall.items.find(
-			(i) => i.id === memoryLexicalDocId(result.id),
-		);
+		const cleanHit = cleanRecall.items.find((i) => i.id === result.id);
 		expect(
 			cleanHit,
 			"expected the freshly-written memory in recall results",
@@ -87,9 +84,7 @@ describe("code-anchor + drift-detect end-to-end", () => {
 
 		// Query-time drift detection runs inside recall.
 		const drifted = await memo.recall("Auth Supabase", { limit: 5 });
-		const driftedHit = drifted.items.find(
-			(i) => i.id === memoryLexicalDocId(result.id),
-		);
+		const driftedHit = drifted.items.find((i) => i.id === result.id);
 		expect(
 			driftedHit,
 			"expected the anchored memory in drift recall results",
@@ -119,9 +114,7 @@ describe("code-anchor + drift-detect end-to-end", () => {
 		});
 
 		const recall = await memo.recall("config schema", { limit: 5 });
-		const hit = recall.items.find(
-			(i) => i.id === memoryLexicalDocId(result.id),
-		);
+		const hit = recall.items.find((i) => i.id === result.id);
 		expect(hit, "expected the anchored memory in recall results").toBeDefined();
 		expect(hit?.stale).toBeUndefined();
 		expect(hit?.anchor).toEqual(anchor);
@@ -138,9 +131,7 @@ describe("code-anchor + drift-detect end-to-end", () => {
 		await rm(join(rootDir, "auth.py"));
 
 		const recall = await memo.recall("Auth file deletion", { limit: 5 });
-		const hit = recall.items.find(
-			(i) => i.id === memoryLexicalDocId(result.id),
-		);
+		const hit = recall.items.find((i) => i.id === result.id);
 		expect(hit, "expected the anchored memory in recall results").toBeDefined();
 		expect(hit?.stale).toBe(true);
 		expect(hit?.anchor).toEqual(anchor);
@@ -199,9 +190,7 @@ describe("code-anchor + drift-detect end-to-end", () => {
 			const recall = await coldMemo.recall("Cold-start anchor recovery", {
 				limit: 5,
 			});
-			const hit = recall.items.find(
-				(i) => i.id === memoryLexicalDocId(firstMemoId),
-			);
+			const hit = recall.items.find((i) => i.id === firstMemoId);
 			expect(
 				hit,
 				"expected cold-started recall to surface the anchored memory",
@@ -232,9 +221,7 @@ describe("code-anchor + drift-detect end-to-end", () => {
 
 		// Recall returns the memory with no `anchor` / `stale` fields.
 		const recall = await memo.recall("unanchored observation", { limit: 5 });
-		const hit = recall.items.find(
-			(i) => i.id === memoryLexicalDocId(result.id),
-		);
+		const hit = recall.items.find((i) => i.id === result.id);
 		expect(hit).toBeDefined();
 		expect(hit?.anchor).toBeUndefined();
 		expect(hit?.stale).toBeUndefined();
@@ -340,9 +327,7 @@ describe("code-anchor + drift-detect end-to-end", () => {
 		// The structured items[] still carry the typed fields for programmatic
 		// consumers (the banner is the rendered-text counterpart, not a
 		// replacement for the typed payload).
-		const driftedHit = driftedContext.items?.find(
-			(i) => i.id === memoryLexicalDocId(result.id),
-		);
+		const driftedHit = driftedContext.items?.find((i) => i.id === result.id);
 		expect(driftedHit?.stale).toBe(true);
 		expect(driftedHit?.anchor).toEqual(anchor);
 	});
