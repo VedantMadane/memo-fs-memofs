@@ -88,3 +88,14 @@ describe("chunkText", () => {
 		);
 	});
 });
+
+describe("chunkText empty / whitespace-only input", () => {
+  it("returns an empty array", () => {
+    const opts = {
+      source: { type: "file", path: "doc.md" },
+      memoryType: "notes",
+    } as any;
+    expect(chunkText("", opts)).toEqual([]);
+    expect(chunkText("   \n\t  ", opts)).toEqual([]);
+  });
+});
